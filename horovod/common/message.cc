@@ -66,11 +66,11 @@ const std::string& DataType_Name(DataType value) {
 std::size_t DataType_Size(DataType value) {
   switch (value) {
     case HOROVOD_UINT8:
-      return sizeof(u_int8_t);
+      return sizeof(uint8_t);
     case HOROVOD_INT8:
       return sizeof(int8_t);
     case HOROVOD_UINT16:
-      return sizeof(u_int16_t);
+      return sizeof(uint16_t);
     case HOROVOD_INT16:
       return sizeof(int16_t);
     case HOROVOD_INT32:

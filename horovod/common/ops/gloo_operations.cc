@@ -33,11 +33,11 @@ IGlooAlgorithms* GetAlgorithmsForType(DataType dtype,
                                       GlooContext* gloo_context) {
   switch (dtype) {
   case HOROVOD_UINT8:
-    return new GlooAlgorithms<u_int8_t>(gloo_context);
+    return new GlooAlgorithms<uint8_t>(gloo_context);
   case HOROVOD_INT8:
     return new GlooAlgorithms<int8_t>(gloo_context);
   case HOROVOD_UINT16:
-    return new GlooAlgorithms<u_int16_t>(gloo_context);
+    return new GlooAlgorithms<uint16_t>(gloo_context);
   case HOROVOD_INT16:
     return new GlooAlgorithms<int16_t>(gloo_context);
   case HOROVOD_INT32:
