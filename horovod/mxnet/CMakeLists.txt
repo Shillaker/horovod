@@ -5,11 +5,26 @@ endif()
 set(Mxnet_TARGET_LIB "mxnet")
 
 # Find MXNet
-set(Mxnet_REQUIRED "")
-if ("$ENV{HOROVOD_WITH_MXNET}" STREQUAL "1")
-    set(Mxnet_REQUIRED "REQUIRED")
-endif ()
-find_package(Mxnet "1.4.0" ${Mxnet_REQUIRED})
+if(HOROVOD_FAASM)
+    message(STATUS "Using Faasm MXNet lib")
+    set(MXNET_FOUND TRUE)
+
+    set(Mxnet_INCLUDE_DIRS 
+        ${CMAKE_SYSROOT}/include/mxnet
+        )
+
+    set(Mxnet_LIBRARIES 
+        ${CMAKE_SYSROOT}/lib/wasm32-wasi/libmxnet.so
+        ${CMAKE_SYSROOT}/lib/wasm32-wasi/libdmlc.a
+        )
+else()
+    set(Mxnet_REQUIRED "")
+    if ("$ENV{HOROVOD_WITH_MXNET}" STREQUAL "1")
+        set(Mxnet_REQUIRED "REQUIRED")
+    endif ()
+    find_package(Mxnet "1.4.0" ${Mxnet_REQUIRED})
+endif()
+
 if(NOT MXNET_FOUND)
     return()
 endif()

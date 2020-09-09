@@ -67,11 +67,18 @@ if(DEFINED ENV{AR})
 endif()
 # Make CMAKE read CPPFLAGS
 set(CMAKE_CXX_FLAGS "$ENV{CPPFLAGS} ${CMAKE_CXX_FLAGS}")
+
 # Add default project CXX flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -fPIC -O3 -Wall -ftree-vectorize -g")
-# Add architecture specific optimization flags
-set(ARCH_FLAGS "-mf16c" "-mavx" "-mfma")
-set_build_arch_flags("${ARCH_FLAGS}")
+if(HOROVOD_FAASM)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O3 -Wall -ftree-vectorize -g")
+else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -fPIC -O3 -Wall -ftree-vectorize -g")
+
+    # Add architecture specific optimization flags
+    set(ARCH_FLAGS "-mf16c" "-mavx" "-mfma")
+    set_build_arch_flags("${ARCH_FLAGS}")
+endif()
+
 # Specify Horovod exports
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup -Wl,-exported_symbols_list,${CMAKE_SOURCE_DIR}/horovod.exp")
