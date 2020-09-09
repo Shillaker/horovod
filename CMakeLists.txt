@@ -7,6 +7,8 @@ endif()
 
 project(horovod CXX)
 
+option(HOROVOD_FAASM "Build Horovod for Faasm" ON)
+
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -111,7 +113,16 @@ if (NOT "$ENV{HOROVOD_WITHOUT_MPI}" STREQUAL "1")
     if ("$ENV{HOROVOD_WITH_MPI}" STREQUAL "1")
         set(MPI_REQUIRED "REQUIRED")
     endif ()
-    find_package(MPI ${MPI_REQUIRED})
+
+    if(HOROVOD_FAASM)
+        message(STATUS "Skipping find MPI for Faasm build")
+        set(MPI_FOUND TRUE)
+        set(MPI_INCLUDE_PATH ${CMAKE_SYSROOT})
+        set(MPI_LIBRARIES mpi)
+    else()
+        find_package(MPI ${MPI_REQUIRED})
+    endif()
+
     if(MPI_FOUND)
         include_directories(SYSTEM ${MPI_INCLUDE_PATH})
         list(APPEND LINKER_LIBS ${MPI_LIBRARIES})
@@ -266,11 +277,15 @@ endif()
 # Get Python suffix
 execute_process(COMMAND ${PY_EXE} -c "import sysconfig; print(next(x for x in [sysconfig.get_config_var('EXT_SUFFIX'), sysconfig.get_config_var('SO'), '.so'] if x))"
                 OUTPUT_VARIABLE Python_SUFFIX OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
-
+            
+if(HOROVOD_FAASM)
+else()
 # TF
 add_subdirectory(horovod/tensorflow)
 # PyTorch
 add_subdirectory(horovod/torch)
+endif()
+
 #MXNet
 add_subdirectory(horovod/mxnet)
 
