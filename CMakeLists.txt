@@ -83,6 +83,8 @@ endif()
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup -Wl,-exported_symbols_list,${CMAKE_SOURCE_DIR}/horovod.exp")
     set(CMAKE_MACOSX_RPATH TRUE)
+elseif(HOROVOD_FAASM)
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}")
 else()
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--version-script=${CMAKE_SOURCE_DIR}/horovod.lds -Wl,-Bsymbolic-functions -Wl,-z,relro,-z,now")
 endif()
@@ -284,13 +286,18 @@ endif()
 # Get Python suffix
 execute_process(COMMAND ${PY_EXE} -c "import sysconfig; print(next(x for x in [sysconfig.get_config_var('EXT_SUFFIX'), sysconfig.get_config_var('SO'), '.so'] if x))"
                 OUTPUT_VARIABLE Python_SUFFIX OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
-            
+           
+# General dependency configuration
 if(HOROVOD_FAASM)
+    # mshadow compatibility
+    add_definitions(-DMSHADOW_USE_CUDA=0)
+    add_definitions(-DMSHADOW_USE_SSE=0)
 else()
-# TF
-add_subdirectory(horovod/tensorflow)
-# PyTorch
-add_subdirectory(horovod/torch)
+    # TF
+    add_subdirectory(horovod/tensorflow)
+    
+    # PyTorch
+    add_subdirectory(horovod/torch)
 endif()
 
 #MXNet

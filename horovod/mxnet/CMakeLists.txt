@@ -58,3 +58,4 @@ target_link_libraries(${Mxnet_TARGET_LIB} ${LINKER_LIBS} ${Mxnet_LINKER_LIBS})
 set_target_properties(${Mxnet_TARGET_LIB} PROPERTIES SUFFIX "${Python_SUFFIX}")
 set_target_properties(${Mxnet_TARGET_LIB} PROPERTIES PREFIX "")
 set_target_properties(${Mxnet_TARGET_LIB} PROPERTIES OUTPUT_NAME "mpi_lib")
+
