@@ -14,7 +14,7 @@ if(HOROVOD_FAASM)
         )
 
     set(Mxnet_LIBRARIES 
-        ${CMAKE_SYSROOT}/lib/wasm32-wasi/libmxnet.so
+        ${CMAKE_SYSROOT}/lib/wasm32-wasi/libmxnet.a
         ${CMAKE_SYSROOT}/lib/wasm32-wasi/libdmlc.a
         )
 else()
@@ -53,9 +53,25 @@ list(APPEND Mxnet_SOURCES "${PROJECT_SOURCE_DIR}/horovod/mxnet/mpi_ops.cc"
 
 # Create library
 set_output_dir()
-add_library(${Mxnet_TARGET_LIB} SHARED ${SOURCES} ${Mxnet_SOURCES})
+
+# When building for Faasm, we need to have a static lib
+if(HOROVOD_FAASM)
+    add_library(${Mxnet_TARGET_LIB} STATIC ${SOURCES} ${Mxnet_SOURCES})
+else()
+    add_library(${Mxnet_TARGET_LIB} SHARED ${SOURCES} ${Mxnet_SOURCES})
+    set_target_properties(${Mxnet_TARGET_LIB} PROPERTIES SUFFIX "${Python_SUFFIX}")
+endif()
+
 target_link_libraries(${Mxnet_TARGET_LIB} ${LINKER_LIBS} ${Mxnet_LINKER_LIBS})
-set_target_properties(${Mxnet_TARGET_LIB} PROPERTIES SUFFIX "${Python_SUFFIX}")
 set_target_properties(${Mxnet_TARGET_LIB} PROPERTIES PREFIX "")
-set_target_properties(${Mxnet_TARGET_LIB} PROPERTIES OUTPUT_NAME "mpi_lib")
+
+# NOTE - here we're setting the name for the final library
+set_target_properties(${Mxnet_TARGET_LIB} PROPERTIES OUTPUT_NAME "horovod_mxnet")
+
+# Set up install
+install(TARGETS ${Mxnet_TARGET_LIB}
+        ARCHIVE DESTINATION ${CMAKE_SYSROOT}/lib/wasm32-wasi
+        LIBRARY DESTINATION ${CMAKE_SYSROOT}/lib/wasm32-wasi
+        PUBLIC_HEADER DESTINATION ${CMAKE_SYSROOT}/include/horovod
+    )
 
