@@ -71,6 +71,10 @@ class custom_build_ext(build_ext):
                       '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{}={}'.format(config.upper(), build_dir),
                       '-DPYTHON_EXECUTABLE:FILEPATH=' + sys.executable]
 
+        toolchain_file = os.environ.get('HOROVOD_TOOLCHAIN_FILE')
+        if toolchain_file:
+            cmake_args.append('-DCMAKE_TOOLCHAIN_FILE=' + toolchain_file)
+
         make_args = ['-j8'] if not os.environ.get('MAKEFLAGS') else []
         if self.verbose:
             make_args.append('VERBOSE=1')
