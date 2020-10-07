@@ -98,7 +98,7 @@ class custom_build_ext(build_ext):
 
 
 # python packages required to use horovod in general
-require_list = ['cloudpickle', 'psutil', 'pyyaml', 'dataclasses;python_version<"3.7"']
+require_list = ['cloudpickle', 'pyyaml', 'dataclasses;python_version<"3.7"']
 
 # python packages required / recommended to develop horovod
 # e.g., set of framework versions pinned for development, keep in sync with Dockerfile.test.cpu
